@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -16,14 +17,14 @@ namespace EmployeeManagement.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: false),
                     Salary = table.Column<int>(type: "int", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Department = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Qualification = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Createddate = table.Column<DateTime>(type: "nvarchar(max)", nullable: false),
-                    Updateddate = table.Column<DateTime>(type: "nvarchar(max)", nullable: false)
+                    Createddate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updateddate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {

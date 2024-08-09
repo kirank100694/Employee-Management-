@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using EmployeeManagement.Data;
+using EmployeeManagement.Migrations;
 using EmployeeManagement.Models;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
@@ -9,73 +10,63 @@ namespace EmployeeManagement.Repository
     public class EmployeeRepository : IEmployeeRepository
     {
         private readonly EmployeeContext _employeeContext;
-        private readonly IMapper _mapper;
 
-        public EmployeeRepository(EmployeeContext employeeContext, IMapper mapper)
+        public EmployeeRepository(EmployeeContext employeeContext)
         {
             _employeeContext = employeeContext;
-            _mapper = mapper;
         }
 
-        public async Task<List<Employee>> GetAllEmployees()
+        public async Task<List<Employee>> GetAllEmployeesAsync()
         {
-            var records = await _employeeContext.Employees.ToListAsync();
-            return _mapper.Map<List<Employee>>(records);
+            return await _employeeContext.Employees.ToListAsync();
         }
 
-        public async Task<Employee> GetEmployeesById(int employeeId)
+        public async Task<Employee> GetEmployeeByIdAsync(int id)
         {
-            var records = await _employeeContext.Employees.FindAsync(employeeId);
-            return _mapper.Map<Employee>(records);
+            return await _employeeContext.Employees.FindAsync(id);
         }
 
-        public async Task<bool> IsIdExists(int Id)
+        public async Task AddEmployeeAsync(Employee employee)
         {
-            var records = await _employeeContext.Employees.FindAsync(Id);
-            return records != null ? true : false;
-        }
-
-        public async Task<int> AddEmployeesAsync(Employee employee)
-        {
-            var records = _mapper.Map<Employee>(employee);
-            records.Createddate = DateTime.Now;
-
             _employeeContext.Employees.Add(employee);
             await _employeeContext.SaveChangesAsync();
-
-            return records.Id;
-
         }
 
-        public async Task UpdateEmployeesAsync(int employeeId, Employee employee)
+        public async Task UpdateEmployeeAsync(Employee employee)
         {
-            var records = _mapper.Map<Employee>(employee);
-            records.Createddate = DateTime.Now;
-
-            _employeeContext.Employees.Update(records);
+            _employeeContext.Entry(employee).State = EntityState.Modified;
             await _employeeContext.SaveChangesAsync();
         }
 
-        public async Task UpdateEmployeesPatchAsync(int employeeId, JsonPatchDocument employee)
+        public async Task UpdateEmployeesPatchAsync(int employeeId, JsonPatchDocument<Employee> patchEmployee)
         {
-            var record = await _employeeContext.Employees.FindAsync(employeeId);
-            if (record != null)
+            var employee = await _employeeContext.Employees.FindAsync(employeeId);
+            if (employee == null)
             {
-                employee.ApplyTo(record);
+                throw new KeyNotFoundException("Employee not found.");
+            }
+
+            // Apply the patch document to the employee entity
+            patchEmployee.ApplyTo(employee);
+
+            // Update the employee's updated date
+            employee.UpdatedDate = DateTime.UtcNow;
+
+            // Mark the entity as modified
+            _employeeContext.Entry(employee).State = EntityState.Modified;
+
+            // Save changes to the database
+            await _employeeContext.SaveChangesAsync();
+        }
+
+        public async Task DeleteEmployeeAsync(int id)
+        {
+            var employee = await _employeeContext.Employees.FindAsync(id);
+            if (employee != null)
+            {
+                _employeeContext.Employees.Remove(employee);
                 await _employeeContext.SaveChangesAsync();
             }
-        }
-
-        public async Task DeleteEmployeesAsync(int employeeId)
-        {
-            var records = new Employee()
-            {
-                Id = employeeId
-            };
-
-            _employeeContext.Employees.Remove(records);
-
-            await _employeeContext.SaveChangesAsync();
         }
     }
 }

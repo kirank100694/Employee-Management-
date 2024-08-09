@@ -1,5 +1,6 @@
 
 using EmployeeManagement.Data;
+using EmployeeManagement.Helper;
 using EmployeeManagement.Repository;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +19,7 @@ namespace EmployeeManagement
 
             builder.Services.AddTransient<IEmployeeRepository , EmployeeRepository>();
 
-            builder.Services.AddAutoMapper(typeof(Program));
+            builder.Services.AddAutoMapper(typeof(ApplicationMapper));
 
             builder.Services.AddControllers().AddNewtonsoftJson();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

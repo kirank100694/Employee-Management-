@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace EmployeeManagement.Models
+namespace EmployeeManagement.Data
 {
-    public class Employee
+    public class EmployeeUpdateDate
     {
-        [Key]
+        [Required]
         public int Id { get; set; }
 
         [Required]
@@ -30,8 +30,6 @@ namespace EmployeeManagement.Models
         [Required]
         [StringLength(100, ErrorMessage = "Qualification cannot be longer than 100 characters.")]
         public string Qualification { get; set; }
-
-        public DateTime CreatedDate { get; set; }
-        public DateTime UpdatedDate { get; set; }
     }
 }
+
