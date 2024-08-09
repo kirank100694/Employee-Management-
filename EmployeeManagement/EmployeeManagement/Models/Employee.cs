@@ -11,8 +11,8 @@ namespace EmployeeManagement.Models
         [StringLength(100, ErrorMessage = "Name cannot be longer than 100 characters.")]
         public string Name { get; set; }
 
-        [Range(0, double.MaxValue, ErrorMessage = "Salary must be a positive number.")]
-        public decimal Salary { get; set; }
+        [Range(0, int.MaxValue, ErrorMessage = "Salary must be a positive number.")]
+        public int Salary { get; set; }
 
         [Required]
         [StringLength(200, ErrorMessage = "Location cannot be longer than 200 characters.")]

@@ -10,13 +10,15 @@ namespace EmployeeManagement.Repository
     public class EmployeeRepository : IEmployeeRepository
     {
         private readonly EmployeeContext _employeeContext;
+        private readonly IMapper _mapper;
 
-        public EmployeeRepository(EmployeeContext employeeContext)
+        public EmployeeRepository(EmployeeContext employeeContext, IMapper mapper)
         {
             _employeeContext = employeeContext;
+            _mapper = mapper;
         }
 
-        public async Task<List<Employee>> GetAllEmployeesAsync()
+        public async Task<List<Employee>> GetEmployeesAsync()
         {
             return await _employeeContext.Employees.ToListAsync();
         }
