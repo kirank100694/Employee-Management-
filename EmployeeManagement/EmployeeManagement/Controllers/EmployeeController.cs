@@ -21,7 +21,7 @@ namespace EmployeeManagement.Controllers
         public async Task<ActionResult<Employee>> GetEmployees()
         {
             var employees = await _employeeRepository.GetEmployeesAsync();
-            if (employees.Count == 0)
+            if (employees == null || employees.Count == 0)
             {
                 return NotFound("Employees are not available");
             }
@@ -36,7 +36,7 @@ namespace EmployeeManagement.Controllers
             var employee = await _employeeRepository.GetEmployeeByIdAsync(id);
             if (employee == null)
             {
-                return NotFound("Given Id Is not in database");
+                return NotFound("Given Id Is not in Employeedatabase");
             }
             return Ok(employee);
         }

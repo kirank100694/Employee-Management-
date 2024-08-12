@@ -1,6 +1,4 @@
-
 using EmployeeManagement.Data;
-using EmployeeManagement.Helper;
 using EmployeeManagement.Repository;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,12 +12,10 @@ namespace EmployeeManagement
 
             // Add services to the container.
 
-            builder.Services.AddDbContext<EmployeeContext>
+            builder.Services.AddDbContext<EmployeeDbContext>
                 (options => options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeeManagmentDB")));
 
             builder.Services.AddScoped<IEmployeeRepository , EmployeeRepository>();
-
-            builder.Services.AddAutoMapper(typeof(ApplicationMapper));
 
             builder.Services.AddControllers().AddNewtonsoftJson();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

@@ -6,9 +6,9 @@ namespace EmployeeManagement.Repository
 {
     public class EmployeeRepository : IEmployeeRepository
     {
-        private readonly EmployeeContext _employeeContext;
+        private readonly EmployeeDbContext _employeeContext;
 
-        public EmployeeRepository(EmployeeContext employeeContext)
+        public EmployeeRepository(EmployeeDbContext employeeContext)
         {
             _employeeContext = employeeContext;
         }
@@ -43,6 +43,21 @@ namespace EmployeeManagement.Repository
 
             await _employeeContext.SaveChangesAsync();
             return existingEmployee;
+        }
+
+        public async Task<bool> UpdateEmployeeAsync(int id, Action<Employee> updateEmployee)
+        {
+            var employee = await _employeeContext.Employees.FindAsync(id);
+            if (employee == null)
+            {
+                return false;
+            }
+
+            updateEmployee(employee);
+            employee.UpdatedDate = DateTime.UtcNow;
+
+            await _employeeContext.SaveChangesAsync();
+            return true;
         }
 
         public async Task<bool> DeleteEmployeeAsync(int id)

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace EmployeeManagement.Migrations
 {
-    [DbContext(typeof(EmployeeContext))]
+    [DbContext(typeof(EmployeeDbContext))]
     partial class EmployeeContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeManagement.Data
 {
-    public class EmployeeContext : DbContext
+    public class EmployeeDbContext : DbContext
     {
-        public EmployeeContext(DbContextOptions<EmployeeContext> options) : base(options)
+        public EmployeeDbContext(DbContextOptions<EmployeeDbContext> options) : base(options)
         {
 
         }
