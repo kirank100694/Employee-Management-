@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
-using EmployeeManagement.Data;
 using EmployeeManagement.Models;
 using EmployeeManagement.Repository;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,64 +11,57 @@ namespace EmployeeManagement.Controllers
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeRepository _employeeRepository;
-        private readonly IMapper _mapper;
 
-        public EmployeeController(IEmployeeRepository employeeRepository, IMapper mapper)
+        public EmployeeController(IEmployeeRepository employeeRepository)
         {
             _employeeRepository = employeeRepository;
-            _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<ActionResult<Employee>> GetEmployees()
         {
             var employees = await _employeeRepository.GetEmployeesAsync();
-            var employeeData = _mapper.Map<List<Employee>>(employees);
+            if (employees.Count == 0)
+            {
+                return NotFound("Employees are not available");
+            }
 
-            return Ok(employeeData);
+            return Ok(employees);
 
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Employee>> GetEmployee(int id)
+        public async Task<IActionResult> GetEmployeeById(int id)
         {
             var employee = await _employeeRepository.GetEmployeeByIdAsync(id);
             if (employee == null)
             {
-                return NotFound();
+                return NotFound("Given Id Is not in database");
             }
             return Ok(employee);
         }
 
         [HttpPost]
-        public async Task<ActionResult<Employee>> PostEmployee(Employee employeeDate)
+        public async Task<IActionResult> AddEmployee([FromBody] Employee employee)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var existingEmployee = await _employeeRepository.GetEmployeeByIdAsync(employeeDate.Id);
-            if (existingEmployee != null)
-            {
-                return Conflict("Employee with this ID already exists.");
-            }
+            employee.CreatedDate = DateTime.Now;
+            employee.UpdatedDate = DateTime.Now;
 
-            var employee = _mapper.Map<Employee>(employeeDate);
-            employee.CreatedDate = DateTime.UtcNow;
-            employee.UpdatedDate = DateTime.UtcNow;
-
-            await _employeeRepository.AddEmployeeAsync(employee);
-            var newEmployeeDate = _mapper.Map<EmployeeCreateDate>(employee);
-            return CreatedAtAction(nameof(GetEmployee), new { id = employee.Id }, newEmployeeDate);
+            var createdEmployee = await _employeeRepository.AddEmployeeAsync(employee);
+            return CreatedAtAction(nameof(GetEmployeeById), new { id = createdEmployee.Id }, createdEmployee);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEmployee(int id, Employee employeeData)
+        public async Task<IActionResult> UpdateEmployee(int id, [FromBody] Employee employee)
         {
-            if (id != employeeData.Id)
+            if (id != employee.Id)
             {
-                return BadRequest();
+                return BadRequest("ID mismatch.");
             }
 
             if (!ModelState.IsValid)
@@ -78,26 +69,20 @@ namespace EmployeeManagement.Controllers
                 return BadRequest(ModelState);
             }
 
-            var existingEmployee = await _employeeRepository.GetEmployeeByIdAsync(id);
-            if (existingEmployee == null)
+            var updatedEmployee = await _employeeRepository.UpdateEmployeeAsync(employee);
+            if (updatedEmployee == null)
             {
                 return NotFound();
             }
-
-            var employee = _mapper.Map<Employee>(employeeData);
-            employee.CreatedDate = existingEmployee.CreatedDate;  // Preserve original CreatedDate
-            employee.UpdatedDate = DateTime.UtcNow;
-
-            await _employeeRepository.UpdateEmployeeAsync(employee);
-            return NoContent();
+            return Ok(updatedEmployee);
         }
 
         [HttpPatch("{id}")]
-        public async Task<IActionResult> PatchEmployee(int id, JsonPatchDocument<EmployeeUpdateDate> employeePatch)
+        public async Task<IActionResult> UpdateEmployee(int id, [FromBody] JsonPatchDocument<Employee> employees)
         {
-            if (employeePatch == null)
+            if (employees == null)
             {
-                return BadRequest();
+                return BadRequest("Updating employee is not in the list.");
             }
 
             var existingEmployee = await _employeeRepository.GetEmployeeByIdAsync(id);
@@ -106,32 +91,32 @@ namespace EmployeeManagement.Controllers
                 return NotFound();
             }
 
-            var employeeDate = _mapper.Map<EmployeeUpdateDate>(existingEmployee);
-            employeePatch.ApplyTo(employeeDate, ModelState);
+            employees.ApplyTo(existingEmployee, ModelState);
 
-            if (!TryValidateModel(employeeDate))
+            if (!TryValidateModel(existingEmployee))
             {
                 return ValidationProblem(ModelState);
             }
 
-            var employee = _mapper.Map<Employee>(employeeDate);
-            employee.CreatedDate = existingEmployee.CreatedDate;  
-            employee.UpdatedDate = DateTime.UtcNow;
+            existingEmployee.UpdatedDate = DateTime.Now;
 
-            await _employeeRepository.UpdateEmployeeAsync(employee);
-            return NoContent();
+            var updatedEmployee = await _employeeRepository.UpdateEmployeeAsync(existingEmployee);
+            if (updatedEmployee == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(updatedEmployee);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEmployee(int id)
         {
-            var existingEmployee = await _employeeRepository.GetEmployeeByIdAsync(id);
-            if (existingEmployee == null)
+            var result = await _employeeRepository.DeleteEmployeeAsync(id);
+            if (!result)
             {
                 return NotFound("Entered Id is Not in a list");
             }
-
-            await _employeeRepository.DeleteEmployeeAsync(id);
             return NoContent();
         }
     }

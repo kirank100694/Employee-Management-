@@ -17,7 +17,7 @@ namespace EmployeeManagement
             builder.Services.AddDbContext<EmployeeContext>
                 (options => options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeeManagmentDB")));
 
-            builder.Services.AddTransient<IEmployeeRepository , EmployeeRepository>();
+            builder.Services.AddScoped<IEmployeeRepository , EmployeeRepository>();
 
             builder.Services.AddAutoMapper(typeof(ApplicationMapper));
 

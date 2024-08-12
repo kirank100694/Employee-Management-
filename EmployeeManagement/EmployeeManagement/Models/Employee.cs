@@ -4,7 +4,6 @@ namespace EmployeeManagement.Models
 {
     public class Employee
     {
-        [Key]
         public int Id { get; set; }
 
         [Required]

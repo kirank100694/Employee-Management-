@@ -7,9 +7,8 @@ namespace EmployeeManagement.Repository
     {
         Task<List<Employee>> GetEmployeesAsync();
         Task<Employee> GetEmployeeByIdAsync(int id);
-        Task AddEmployeeAsync(Employee employee);
-        Task UpdateEmployeeAsync(Employee employee);
-        Task UpdateEmployeesPatchAsync(int employeeId, JsonPatchDocument<Employee> patchEmployee);
-        Task DeleteEmployeeAsync(int id);
+        Task<Employee> AddEmployeeAsync(Employee employee);
+        Task<Employee> UpdateEmployeeAsync(Employee employee);
+        Task<bool> DeleteEmployeeAsync(int id);
     }
 }
