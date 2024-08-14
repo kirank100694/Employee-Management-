@@ -15,7 +15,9 @@ namespace EmployeeManagement
             builder.Services.AddDbContext<EmployeeDbContext>
                 (options => options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeeManagmentDB")));
 
-            builder.Services.AddScoped<IEmployeeRepository , EmployeeRepository>();
+            builder.Services.AddTransient<IEmployeeRepository , EmployeeRepository>();
+
+            builder.Services.AddAutoMapper(typeof(Program));
 
             builder.Services.AddControllers().AddNewtonsoftJson();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -34,7 +36,6 @@ namespace EmployeeManagement
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

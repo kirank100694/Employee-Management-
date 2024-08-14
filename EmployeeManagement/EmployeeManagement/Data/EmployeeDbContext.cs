@@ -1,5 +1,4 @@
-﻿using EmployeeManagement.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeManagement.Data
 {

@@ -1,20 +1,23 @@
-﻿using EmployeeManagement.Models;
-using Microsoft.AspNetCore.JsonPatch;
+﻿using Microsoft.AspNetCore.JsonPatch;
 
 namespace EmployeeManagement.Repository
 {
     public interface IEmployeeRepository
     {
-        Task<List<Employee>> GetEmployeesAsync();
+        Task<List<EmployeeModel>> GetEmployees();
 
-        Task<Employee> GetEmployeeByIdAsync(int id);
+        Task<EmployeeModel> GetEmployeeById(int employeeId);
 
-        Task<Employee> AddEmployeeAsync(Employee employee);
+        Task<int> AddEmployee(EmployeeModel employeeModel);
 
-        Task<Employee> UpdateEmployeeAsync(Employee employee);
+        Task UpdateEmployee(EmployeeModel existingEmployee, EmployeeModel employeeModel);
 
-        Task<bool> UpdateEmployeeAsync(int id, Action<Employee> updateEmployee);
+        Task UpdateEmployee(EmployeeModel existingEmployee, JsonPatchDocument employeeModel);
 
-        Task<bool> DeleteEmployeeAsync(int id);
+        Task DeleteEmployeeById(int employeeId);
+
+        Task<bool> IsEmployeeExists(int id);
+
+        Task<bool> IsEmployeeExists(string email);
     }
 }

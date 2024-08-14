@@ -1,76 +1,79 @@
-﻿using EmployeeManagement.Data;
-using EmployeeManagement.Models;
+﻿using AutoMapper;
+using EmployeeManagement.Data;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeManagement.Repository
 {
     public class EmployeeRepository : IEmployeeRepository
     {
-        private readonly EmployeeDbContext _employeeContext;
+        private readonly EmployeeDbContext _context;
+        private readonly IMapper _mapper;
 
-        public EmployeeRepository(EmployeeDbContext employeeContext)
+        public EmployeeRepository(EmployeeDbContext context, IMapper mapper)
         {
-            _employeeContext = employeeContext;
+            _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<List<Employee>> GetEmployeesAsync()
+        public async Task<List<EmployeeModel>> GetEmployees()
         {
-            return await _employeeContext.Employees.ToListAsync();
+            var employee = await _context.Employees.ToListAsync();
+            return _mapper.Map<List<EmployeeModel>>(employee);
         }
 
-        public async Task<Employee> GetEmployeeByIdAsync(int id)
+        public async Task<EmployeeModel> GetEmployeeById(int employeeId)
         {
-            return await _employeeContext.Employees.FindAsync(id);
+            var employee = await _context.Employees.FindAsync(employeeId);
+            return _mapper.Map<EmployeeModel>(employee);
         }
 
-        public async Task<Employee> AddEmployeeAsync(Employee employee)
+        public async Task<int> AddEmployee(EmployeeModel employeeModel)
         {
-            _employeeContext.Add(employee);
-            await _employeeContext.SaveChangesAsync();
-            return employee;
+            var employee = _mapper.Map<Employee>(employeeModel);
+            employee.CreatedDate = DateTime.Now;
+
+            _context.Employees.Add(employee);
+            await _context.SaveChangesAsync();
+
+            return employee.Id;
         }
 
-        public async Task<Employee> UpdateEmployeeAsync(Employee employee)
+        public async Task UpdateEmployee(EmployeeModel existingEmployee, EmployeeModel employeeModel)
         {
-            var existingEmployee = await _employeeContext.Employees.FindAsync(employee.Id);
-            if (existingEmployee == null)
-            {
-                return null;
-            }
+            _mapper.Map(employeeModel, existingEmployee);
 
-            _employeeContext.Entry(existingEmployee).CurrentValues.SetValues(employee);
-            existingEmployee.UpdatedDate = DateTime.UtcNow;
+            existingEmployee.UpdatedDate = DateTime.Now;
 
-            await _employeeContext.SaveChangesAsync();
-            return existingEmployee;
+            await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> UpdateEmployeeAsync(int id, Action<Employee> updateEmployee)
+        public async Task UpdateEmployee(EmployeeModel existingEmployee, JsonPatchDocument employeeModel)
         {
-            var employee = await _employeeContext.Employees.FindAsync(id);
-            if (employee == null)
-            {
-                return false;
-            }
+            employeeModel.ApplyTo(existingEmployee);
 
-            updateEmployee(employee);
-            employee.UpdatedDate = DateTime.UtcNow;
+            existingEmployee.UpdatedDate = DateTime.Now;
 
-            await _employeeContext.SaveChangesAsync();
-            return true;
+            await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> DeleteEmployeeAsync(int id)
+        public async Task DeleteEmployeeById(int employeeId)
         {
-            var employee = await _employeeContext.Employees.FindAsync(id);
-            if (employee == null)
-            {
-                return false;
-            }
+            var employee = new Employee() { Id = employeeId };
 
-            _employeeContext.Employees.Remove(employee);
-            await _employeeContext.SaveChangesAsync();
-            return true;
+            _context.Employees.Remove(employee);
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> IsEmployeeExists(int id)
+        {
+            return await _context.Employees.AnyAsync(e => e.Id == id);
+        }
+
+        public async Task<bool> IsEmployeeExists(string email)
+        {
+            return await _context.Employees.AnyAsync(e => e.Email == email);
         }
     }
 }
