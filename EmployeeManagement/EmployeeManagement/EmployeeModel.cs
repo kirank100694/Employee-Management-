@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EmployeeManagement
 {
@@ -7,7 +8,7 @@ namespace EmployeeManagement
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Name is required")]
-        [StringLength(100, ErrorMessage = "Name length can't be more than 100.")]
+        [StringLength(30, ErrorMessage = "Name length can't be more than 30.")]
         public string Name { get; set; }
 
         [Range(1, long.MaxValue, ErrorMessage = "Salary must be a positive number")]
