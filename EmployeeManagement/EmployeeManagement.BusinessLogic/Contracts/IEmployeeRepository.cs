@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.JsonPatch;
+﻿using EmployeeManagement.Helper;
+using EmployeeManagement.Models;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace EmployeeManagement.Repository
 {
     public interface IEmployeeRepository
     {
-        Task<List<EmployeeModel>> GetEmployees();
+        Task<List<EmployeeModel>> GetEmployees(PagingHelper pagingHelper);
 
         Task<EmployeeModel> GetEmployeeById(int employeeId);
 

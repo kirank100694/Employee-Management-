@@ -1,11 +1,15 @@
-﻿using EmployeeManagement.Repository;
+﻿using EmployeeManagement.Helper;
+using EmployeeManagement.Models;
+using EmployeeManagement.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
-namespace EmployeeManagement.Controllers
+namespace EmployeeManagement.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeRepository _employeeRepository;
@@ -16,9 +20,9 @@ namespace EmployeeManagement.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetEmployees()
+        public async Task<IActionResult> GetEmployees([FromBody] PagingHelper pagingHelper)
         {
-            var employees = await _employeeRepository.GetEmployees();
+            var employees = await _employeeRepository.GetEmployees(pagingHelper);
 
             if (employees != null && employees.Count == 0)
             {
@@ -37,6 +41,7 @@ namespace EmployeeManagement.Controllers
             {
                 return BadRequest($"Employee with ID {id} not found.");
             }
+
             return Ok(employee);
         }
 
@@ -56,12 +61,14 @@ namespace EmployeeManagement.Controllers
         public async Task<ActionResult> UpdateEmployee([FromBody] EmployeeModel employeeModel, [FromRoute] int id)
         {
             var existingEmployee = await _employeeRepository.GetEmployeeById(id);
+
             if (existingEmployee == null)
             {
                 return BadRequest($"Employee Id {id} is not found.");
             }
 
             await _employeeRepository.UpdateEmployee(existingEmployee, employeeModel);
+
             return Ok();
         }
 
@@ -75,6 +82,7 @@ namespace EmployeeManagement.Controllers
             }
 
             await _employeeRepository.UpdateEmployee(existingEmployee, employeeModel);
+
             return Ok();
         }
 

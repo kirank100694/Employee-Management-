@@ -4,7 +4,6 @@ namespace EmployeeManagement.Data
 {
     public class Employee
     {
-
         public int Id { get; set; }
 
         [Column(TypeName = "nVarchar(30)")]

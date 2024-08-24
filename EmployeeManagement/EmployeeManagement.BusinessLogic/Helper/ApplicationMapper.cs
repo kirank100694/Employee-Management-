@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using EmployeeManagement.Data;
+using EmployeeManagement.Models;
+
 
 namespace EmployeeManagement.Helper
 {
