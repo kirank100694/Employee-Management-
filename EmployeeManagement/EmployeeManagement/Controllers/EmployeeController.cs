@@ -58,7 +58,7 @@ namespace EmployeeManagement.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateEmployee([FromBody] EmployeeModel employeeModel, [FromRoute] int id)
+        public async Task<ActionResult> UpdateEmployee([FromBody] EmployeeModel employeeModel, int id)
         {
             var existingEmployee = await _employeeRepository.GetEmployeeById(id);
 
@@ -87,7 +87,7 @@ namespace EmployeeManagement.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteEmployee(int id)
+        public async Task<ActionResult> DeleteEmployee([FromRoute]int id)
         {
 
             if (!await _employeeRepository.IsEmployeeExists(id))

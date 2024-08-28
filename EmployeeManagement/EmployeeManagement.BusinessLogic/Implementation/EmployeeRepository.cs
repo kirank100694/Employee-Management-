@@ -30,7 +30,8 @@ namespace EmployeeManagement.Repository
             // Filtering
             if (!string.IsNullOrWhiteSpace(pagingHelper.name))
             {
-                employees = employees.Where(m => m.Name.ToLower().Contains(pagingHelper.name) || m.Department.ToLower().Contains(pagingHelper.name));
+                employees = employees.Where(m => m.Name.ToLower().Contains(pagingHelper.name) 
+                                      || m.Department.ToLower().Contains(pagingHelper.name));
             }
 
             // Sorting
@@ -38,19 +39,23 @@ namespace EmployeeManagement.Repository
             {
                 if (pagingHelper.sortBy == "name")
                 {
-                    employees = pagingHelper.sortByDecending ? employees.OrderByDescending(m => m.Name) : employees.OrderBy(m => m.Name);
+                    employees = pagingHelper.sortByDecending ? employees.OrderByDescending(m => m.Name) : 
+                                                               employees.OrderBy(m => m.Name);
                 }
                 else if (pagingHelper.sortBy == "department")
                 {
-                    employees = pagingHelper.sortByDecending ? employees.OrderByDescending(m => m.Department) : employees.OrderBy(m => m.Department);
+                    employees = pagingHelper.sortByDecending ? employees.OrderByDescending(m => m.Department) : 
+                                                               employees.OrderBy(m => m.Department);
                 }
             }
 
             // Pagination
             var totalItems = await employees.CountAsync();
 
-            var pagedEmployees = await employees.Skip((pagingHelper.page - 1) * pagingHelper.pageSize).Take(pagingHelper.pageSize).ToListAsync();
+            var pagedEmployees = await employees.Skip((pagingHelper.page - 1) *
+                                 pagingHelper.pageSize).Take(pagingHelper.pageSize).ToListAsync();
 
+            string cacheKey = CacheKey.EmployeeModel;
             if (!_cacheProvider.TryGetValue(CacheKey.EmployeeModel, out List<EmployeeModel> employeeModel))
             {
                 var cacheEntryOption = new MemoryCacheEntryOptions
@@ -59,6 +64,8 @@ namespace EmployeeManagement.Repository
                     SlidingExpiration = TimeSpan.FromSeconds(30),
                     Size = 1024
                 };
+
+                //cacheHelper.GetCacheDetails();
 
                 _cacheProvider.Set(CacheKey.EmployeeModel, employees, cacheEntryOption);
             }

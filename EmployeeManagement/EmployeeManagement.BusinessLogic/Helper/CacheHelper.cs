@@ -4,16 +4,15 @@ namespace EmployeeManagement.Helper
 {
     public class CacheHelper
     {
-        //public CacheHelper GetCacheDetails()
-        //{
-        //    var cacheEntryOption = new MemoryCacheEntryOptions
-        //    {
-        //        AbsoluteExpiration = DateTime.Now.AddSeconds(30),
-        //        SlidingExpiration = TimeSpan.FromSeconds(30),
-        //        Size = 1024
-        //    };
-
-        //}
+        public void GetCacheDetails()
+        {
+            var cacheEntryOption = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpiration = DateTime.Now.AddSeconds(30),
+                SlidingExpiration = TimeSpan.FromSeconds(30),
+                Size = 1024
+            };
+        }
     }
 }
 
